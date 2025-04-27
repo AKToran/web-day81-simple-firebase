@@ -1,14 +1,14 @@
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GithubAuthProvider, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import React, { useState } from 'react';
 import { auth } from '../../firebase/firebase.init';
 
 const Login = () => {
   const [user, setUser] = useState(null);
 
-  const provider = new GoogleAuthProvider;
+  const provider = new GoogleAuthProvider();
+  const gitHubProvider = new GithubAuthProvider();
 
   const handleGoogleSignIn = () =>{
-    alert("d");
     signInWithPopup(auth, provider)
     .then(result =>{
       const user = result.user;
@@ -19,10 +19,34 @@ const Login = () => {
     })
   }
 
+  const handleGitHubSignIn = () =>{
+    signInWithPopup(auth, gitHubProvider)
+    .then(result =>{
+      console.log(result);
+      setUser(result.user);
+    })
+    .catch(err =>{
+      console.log(err);
+    })
+  }
+
+  const handleSignOut = () =>{
+    signOut(auth)
+    .then(()=>{
+      console.log("signed out.");
+      setUser(null);
+    }).catch(err => console.log(err));
+  }
+
   return (
     <div className='text-center'>
-      <h1>Please Login</h1>
-      <button onClick={handleGoogleSignIn} className='border-2 hover:cursor-pointer rounded-xl p-2 bg-green-500'>Sign In with Google</button>
+      {
+        user? <button onClick={handleSignOut} className='border-2 hover:cursor-pointer rounded-xl p-2 bg-green-500'>Sign Out</button> : <div><h1>Please Login</h1>
+        <button onClick={handleGoogleSignIn} className='border-2 hover:cursor-pointer rounded-xl p-2 bg-green-500'>Sign In with Google</button>
+        <button onClick={handleGitHubSignIn} className='border-2 hover:cursor-pointer rounded-xl p-2 bg-green-500'> Sign In wit GITHUB </button>
+        </div>
+      }
+      
       {
         user && <div>
           <h1>{user.displayName}</h1>
